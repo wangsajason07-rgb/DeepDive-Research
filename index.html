@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AV Regulatory Barriers — Physical Internet NL · Jason Wangsa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#060e1c; --navy2:#0b1628; --navy3:#0f1e36;
+  --blue:#7eb5ff; --blue2:#378ADD; --blue-dim:rgba(99,160,255,0.12); --blue-border:rgba(99,160,255,0.28);
+  --text:#e8edf5; --muted:rgba(232,237,245,0.55); --faint:rgba(232,237,245,0.22);
+  --card:rgba(255,255,255,0.035); --border:rgba(255,255,255,0.07);
+  --red:#E24B4A; --teal:#1D9E75; --amber:#BA7517; --purple:#7F77DD;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--navy);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent;}
+a,button{touch-action:manipulation;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(6,14,28,0.8);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);transition:background 0.3s;}
+.nav-logo{font-size:11px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:9px;}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(126,181,255,0.5);}50%{box-shadow:0 0 0 6px rgba(126,181,255,0);}}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{font-size:10.5px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--blue);transform:scaleX(0);transition:transform 0.2s;transform-origin:left;}
+.nav-links a:hover{color:var(--text);}
+.nav-links a:hover::after{transform:scaleX(1);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-li{display:inline-flex;align-items:center;gap:6px;background:rgba(10,102,194,0.15);border:1px solid rgba(10,102,194,0.3);color:#5aabf5;font-size:10px;font-weight:700;letter-spacing:0.08em;padding:5px 12px;border-radius:2px;text-decoration:none;transition:background 0.2s;}
+.nav-li:hover{background:rgba(10,102,194,0.28);}
+.nav-badge{background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:5px 11px;border-radius:2px;}
+
+/* CANVAS HERO */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding-top:58px;}
+#particle-canvas{position:absolute;inset:0;z-index:0;}
+.hero-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 48px;width:100%;}
+.eyebrow-row{display:flex;align-items:center;gap:14px;margin-bottom:32px;opacity:0;animation:fadeUp 0.9s 0.2s ease forwards;}
+.ep{background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:5px 14px;border-radius:2px;}
+.er{width:80px;height:1px;background:var(--border);}
+.em{font-size:11px;color:var(--faint);letter-spacing:0.06em;}
+.hero h1{font-family:'Instrument Serif',serif;font-size:clamp(38px,5.5vw,72px);font-weight:400;line-height:1.1;max-width:900px;margin-bottom:28px;opacity:0;animation:fadeUp 0.9s 0.35s ease forwards;}
+.hero h1 em{font-style:italic;color:var(--blue);}
+.hero h1 strong{font-family:'Syne',sans-serif;font-weight:800;font-style:normal;}
+.hero-desc{font-size:15px;color:var(--muted);max-width:560px;line-height:1.75;margin-bottom:44px;opacity:0;animation:fadeUp 0.9s 0.5s ease forwards;}
+.hero-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:56px;opacity:0;animation:fadeUp 0.9s 0.65s ease forwards;}
+.chip{border:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:6px 13px;border-radius:2px;background:var(--card);transition:border-color 0.2s,color 0.2s;}
+.chip:hover{border-color:var(--blue-border);color:var(--blue);}
+.chip.hi{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue);}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);border-bottom:1px solid var(--border);opacity:0;animation:fadeUp 0.9s 0.8s ease forwards;}
+.stat{background:var(--navy);padding:28px 32px;position:relative;overflow:hidden;transition:background 0.3s;}
+.stat:hover{background:var(--navy2);}
+.stat-num{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;line-height:1;margin-bottom:6px;background:linear-gradient(135deg,var(--blue),#a8d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-label{font-size:11px;color:var(--faint);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;}
+.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);transform:scaleX(0);transition:transform 0.4s;}
+.stat:hover::after{transform:scaleX(1);}
+
+/* MARQUEE */
+.marquee-wrap{overflow:hidden;border-bottom:1px solid var(--border);padding:14px 0;background:var(--navy2);}
+.marquee-track{display:flex;gap:0;white-space:nowrap;animation:marquee 30s linear infinite;}
+.marquee-track:hover{animation-play-state:paused;}
+.marquee-item{display:inline-flex;align-items:center;gap:12px;padding:0 32px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint);}
+.marquee-item span{color:var(--blue);font-family:'DM Mono',monospace;}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SECTIONS */
+section{padding:100px 0;}
+.container{max-width:1200px;margin:0 auto;padding:0 48px;}
+.sec-eye{display:flex;align-items:center;gap:12px;margin-bottom:52px;}
+.sec-eye-txt{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--blue);}
+.sec-eye::after{content:'';flex:1;height:1px;background:var(--border);}
+.sec-title{font-family:'Instrument Serif',serif;font-size:clamp(28px,3.5vw,46px);font-weight:400;line-height:1.2;color:var(--text);margin-bottom:16px;}
+.sec-sub{font-size:13.5px;color:var(--muted);max-width:580px;line-height:1.75;margin-bottom:48px;}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:380px 1fr;gap:64px;align-items:start;}
+.about-card{background:var(--card);border:1px solid var(--border);padding:32px;border-radius:2px;position:relative;overflow:hidden;}
+.about-card::before{content:'JW';position:absolute;right:-10px;bottom:-20px;font-family:'Syne',sans-serif;font-weight:800;font-size:100px;color:rgba(126,181,255,0.04);line-height:1;pointer-events:none;}
+.about-name{font-family:'Instrument Serif',serif;font-size:32px;font-weight:400;color:var(--text);line-height:1.2;margin-bottom:4px;}
+.about-name em{font-style:italic;color:var(--blue);}
+.about-role{font-size:11px;color:var(--faint);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:24px;font-family:'DM Mono',monospace;}
+.about-divider{height:1px;background:var(--border);margin-bottom:20px;}
+.about-meta{display:flex;flex-direction:column;gap:10px;}
+.about-meta-row{display:flex;justify-content:space-between;align-items:center;}
+.about-meta-key{font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--faint);font-family:'DM Mono',monospace;}
+.about-meta-val{font-size:11px;color:var(--muted);text-align:right;}
+.about-li-btn{display:inline-flex;align-items:center;gap:8px;margin-top:20px;background:rgba(10,102,194,0.15);border:1px solid rgba(10,102,194,0.3);color:#5aabf5;font-size:11px;font-weight:700;padding:8px 16px;border-radius:2px;text-decoration:none;transition:background 0.2s;width:100%;justify-content:center;}
+.about-li-btn:hover{background:rgba(10,102,194,0.28);}
+.about-text p{font-size:14.5px;color:var(--muted);line-height:1.85;margin-bottom:20px;}
+.about-text p:first-child{font-size:16px;color:var(--text);}
+.about-skills{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px;}
+.about-skill{background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:6px 12px;border-radius:2px;}
+
+/* HYPOTHESIS */
+.hyp-section{background:var(--navy2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.hyp-inner{display:grid;grid-template-columns:1fr 2fr;gap:80px;align-items:center;}
+.hyp-label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--blue);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.hyp-label::before{content:'';width:24px;height:1px;background:var(--blue);}
+.hyp-left h2{font-family:'Instrument Serif',serif;font-size:34px;font-weight:400;color:var(--text);line-height:1.25;}
+.hyp-quote{border-left:2px solid var(--blue);padding:28px 36px;background:rgba(99,160,255,0.05);position:relative;}
+.hyp-quote::before{content:'\201C';position:absolute;top:-20px;left:28px;font-family:'Instrument Serif',serif;font-size:100px;color:rgba(126,181,255,0.08);line-height:1;}
+.hyp-quote p{font-family:'Instrument Serif',serif;font-size:20px;font-style:italic;color:var(--text);line-height:1.65;}
+.hyp-quote p strong{font-style:normal;font-family:'Syne',sans-serif;font-weight:800;color:var(--blue);}
+
+/* FINDINGS */
+.findings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border:1px solid var(--border);}
+.finding{background:var(--navy);padding:40px 36px;position:relative;overflow:hidden;transition:background 0.3s;}
+.finding:hover{background:var(--navy2);}
+.finding-num{font-family:'Syne',sans-serif;font-weight:800;font-size:72px;color:rgba(255,255,255,0.025);position:absolute;right:16px;top:8px;line-height:1;}
+.finding-bar{width:36px;height:3px;border-radius:1px;margin-bottom:22px;}
+.finding h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4;}
+.finding p{font-size:13px;color:var(--muted);line-height:1.75;}
+.finding-cite{font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+
+/* BARRIERS — interactive */
+.barriers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.barrier{border:1px solid var(--border);padding:36px 28px;background:var(--card);border-radius:2px;cursor:pointer;transition:transform 0.3s,border-color 0.3s,background 0.3s;position:relative;overflow:hidden;}
+.barrier::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.3s;}
+.barrier.r::after{background:radial-gradient(circle at 50% 0%,rgba(226,75,74,0.1),transparent 70%);}
+.barrier.t::after{background:radial-gradient(circle at 50% 0%,rgba(29,158,117,0.1),transparent 70%);}
+.barrier.e::after{background:radial-gradient(circle at 50% 0%,rgba(186,117,23,0.1),transparent 70%);}
+.barrier.c::after{background:radial-gradient(circle at 50% 0%,rgba(55,138,221,0.1),transparent 70%);}
+.barrier:hover{transform:translateY(-6px);}
+.barrier.r:hover{border-color:var(--red);}
+.barrier.t:hover{border-color:var(--teal);}
+.barrier.e:hover{border-color:var(--amber);}
+.barrier.c:hover{border-color:var(--blue2);}
+.barrier:hover::after{opacity:1;}
+.barrier-letter{font-family:'Syne',sans-serif;font-weight:800;font-size:64px;line-height:1;margin-bottom:14px;}
+.barrier-letter.r{color:var(--red);}
+.barrier-letter.t{color:var(--teal);}
+.barrier-letter.e{color:var(--amber);}
+.barrier-letter.c{color:var(--blue2);}
+.barrier-name{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.barrier-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.barrier-tag{font-size:10px;font-weight:600;color:var(--faint);border:1px solid var(--border);padding:3px 8px;border-radius:2px;transition:color 0.2s;}
+.barrier:hover .barrier-tag{color:var(--muted);}
+
+/* BLOCKERS */
+.blockers{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);overflow:hidden;}
+.blocker{display:grid;grid-template-columns:4px 1fr;background:var(--card);border-bottom:1px solid var(--border);transition:background 0.2s;}
+.blocker:last-child{border-bottom:none;}
+.blocker:hover{background:rgba(255,255,255,0.055);}
+.bl-accent{background:var(--red);}
+.bl-accent.b{background:var(--blue2);}
+.bl-accent.a{background:var(--amber);}
+.bl-body{padding:30px 36px;}
+.bl-label{font-family:'DM Mono',monospace;font-size:9.5px;font-weight:500;color:var(--faint);letter-spacing:0.1em;margin-bottom:8px;}
+.bl-body h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4;}
+.bl-body p{font-size:13px;color:var(--muted);line-height:1.75;max-width:760px;}
+
+/* COMPARISON */
+.compare-wrap{overflow-x:auto;margin-top:48px;}
+.compare-table{width:100%;border-collapse:collapse;font-size:13px;}
+.compare-table th{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint);padding:14px 22px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1);background:var(--navy2);}
+.compare-table th.center{text-align:center;}
+.compare-table td{padding:18px 22px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+.compare-table td:first-child{font-weight:700;color:var(--text);font-size:12px;}
+.compare-table tr:last-child td{border-bottom:none;}
+.compare-table tr:hover td{background:rgba(255,255,255,0.02);}
+.ctd{text-align:center;}
+.flag{font-size:22px;display:block;margin-bottom:4px;}
+.cname{font-size:12px;font-weight:700;color:var(--text);}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:2px;font-size:10px;font-weight:700;}
+.pill::before{content:'';width:5px;height:5px;border-radius:50%;}
+.pill.y{background:rgba(29,158,117,0.15);color:#5DCAA5;}
+.pill.y::before{background:var(--teal);}
+.pill.n{background:rgba(226,75,74,0.12);color:#F09595;}
+.pill.n::before{background:var(--red);}
+.pill.m{background:rgba(186,117,23,0.12);color:#FAC775;}
+.pill.m::before{background:var(--amber);}
+
+/* METHODS */
+.methods-section{background:var(--navy2);}
+.methods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.method{border:1px solid var(--border);padding:36px;background:var(--card);display:flex;gap:20px;align-items:flex-start;transition:border-color 0.3s,transform 0.3s;}
+.method:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-3px);}
+.mnum{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--blue);background:var(--blue-dim);border:1px solid var(--blue-border);padding:7px 10px;border-radius:2px;min-width:46px;text-align:center;line-height:1;flex-shrink:0;}
+.method h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px;}
+.method p{font-size:12.5px;color:var(--muted);line-height:1.75;}
+
+/* GAP */
+.gap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.gap-card{border-left:2px solid var(--purple);padding:22px 22px 22px 26px;background:var(--card);border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);transition:background 0.2s,border-left-color 0.2s;}
+.gap-card:hover{background:rgba(127,119,221,0.07);border-left-color:#AFA9EC;}
+.gap-card h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4;}
+.gap-card p{font-size:12px;color:var(--muted);line-height:1.65;}
+
+/* OUTCOMES */
+.outcomes-section{background:var(--navy2);border-top:1px solid var(--border);}
+.outcomes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.outcome{display:flex;gap:18px;align-items:flex-start;padding:28px;border:1px solid var(--border);background:var(--card);transition:border-color 0.3s;}
+.outcome:hover{border-color:rgba(29,158,117,0.4);}
+.oc-icon{width:36px;height:36px;min-width:36px;border:1px solid rgba(29,158,117,0.35);background:rgba(29,158,117,0.1);border-radius:2px;display:flex;align-items:center;justify-content:center;}
+.outcome h4{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.outcome p{font-size:12px;color:var(--muted);line-height:1.65;}
+
+/* TIMELINE */
+.timeline-section{background:var(--navy);}
+.timeline{position:relative;padding-left:32px;}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--blue),rgba(126,181,255,0.1));}
+.tl-item{position:relative;padding:0 0 48px 48px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-dot{position:absolute;left:-7px;top:4px;width:15px;height:15px;border-radius:50%;border:2px solid var(--blue);background:var(--navy);transition:background 0.3s;}
+.tl-item:hover .tl-dot{background:var(--blue);}
+.tl-year{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:var(--blue);letter-spacing:0.1em;margin-bottom:8px;}
+.tl-item h4{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.tl-item p{font-size:13px;color:var(--muted);line-height:1.7;max-width:640px;}
+.tl-tag{display:inline-flex;margin-top:10px;background:var(--card);border:1px solid var(--border);color:var(--faint);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:4px 10px;border-radius:2px;}
+
+/* FOOTER */
+footer{background:var(--navy);border-top:1px solid var(--border);padding:56px 48px 40px;}
+.footer-inner{max-width:1200px;margin:0 auto;}
+.footer-top{display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-bottom:48px;}
+.footer-name{font-family:'Instrument Serif',serif;font-size:28px;font-weight:400;color:var(--text);margin-bottom:8px;}
+.footer-name em{font-style:italic;color:var(--blue);}
+.footer-inst{font-size:12px;color:var(--faint);line-height:1.7;margin-bottom:20px;}
+.footer-li{display:inline-flex;align-items:center;gap:8px;background:rgba(10,102,194,0.15);border:1px solid rgba(10,102,194,0.3);color:#5aabf5;font-size:11px;font-weight:700;padding:9px 18px;border-radius:2px;text-decoration:none;transition:background 0.2s;}
+.footer-li:hover{background:rgba(10,102,194,0.28);}
+.footer-links h5{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--faint);margin-bottom:16px;}
+.footer-links-list{display:flex;flex-direction:column;gap:10px;}
+.footer-links-list a{font-size:13px;color:var(--muted);text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:8px;}
+.footer-links-list a::before{content:'→';color:var(--blue);font-size:11px;}
+.footer-links-list a:hover{color:var(--text);}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:28px;flex-wrap:wrap;gap:12px;}
+.footer-copy{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--faint);}
+.footer-tags{display:flex;gap:7px;flex-wrap:wrap;}
+.ftag{border:1px solid var(--border);color:var(--faint);font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:4px 10px;border-radius:2px;}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity 0.75s ease,transform 0.75s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  nav{padding:0 20px;height:52px;}
+  .nav-links{display:none;}
+  .nav-right{gap:6px;}
+  .nav-badge{display:none;}
+  .nav-li{font-size:9px;padding:4px 9px;}
+  .container{padding:0 20px;}
+  .hero-content{padding:0 20px;}
+  .hero{padding-bottom:0;}
+  .hero h1{font-size:clamp(28px,8vw,48px);}
+  .hero-desc{font-size:13px;}
+  .about-grid,.hyp-inner,.footer-top{grid-template-columns:1fr;gap:28px;}
+  .findings-grid,.methods-grid,.outcomes-grid{grid-template-columns:1fr;}
+  .barriers-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .gap-grid{grid-template-columns:1fr;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .stat{padding:20px;}
+  .stat-num{font-size:32px;}
+  footer{padding:36px 20px 28px;}
+  .finding{padding:28px 22px;}
+  .method{padding:24px 20px;}
+  .outcome{padding:20px;}
+  .bl-body{padding:22px 22px;}
+  .tl-item{padding:0 0 36px 36px;}
+  section{padding:72px 0;}
+  .sec-title{font-size:clamp(24px,6vw,36px);}
+}
+@media(max-width:600px){
+  nav{padding:0 16px;}
+  .container{padding:0 16px;}
+  .hero-content{padding:0 16px;}
+  .hero{min-height:auto;padding-top:72px;padding-bottom:0;}
+  .hero h1{font-size:clamp(24px,7.5vw,36px);line-height:1.2;}
+  .hero-desc{font-size:12.5px;margin-bottom:28px;}
+  .hero-chips{gap:6px;margin-bottom:0;}
+  .chip{font-size:9px;padding:5px 10px;}
+  .stat-row{grid-template-columns:repeat(2,1fr);gap:1px;}
+  .stat{padding:18px 14px;}
+  .stat-num{font-size:28px;}
+  .stat-label{font-size:9px;}
+  .barriers-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .barrier{padding:22px 16px;}
+  .barrier-letter{font-size:44px;}
+  .compare-table{font-size:11px;}
+  .compare-table th,.compare-table td{padding:10px 12px;}
+  .findings-grid{gap:1px;}
+  .finding{padding:24px 18px;}
+  .finding h3{font-size:14px;}
+  .finding p{font-size:12px;}
+  .methods-grid{grid-template-columns:1fr;}
+  .method{padding:20px 18px;flex-direction:column;gap:14px;}
+  .gap-grid{grid-template-columns:1fr;}
+  .outcomes-grid{grid-template-columns:1fr;}
+  .outcome{padding:18px;}
+  .tl-item{padding:0 0 32px 28px;}
+  .tl-item h4{font-size:14px;}
+  .tl-item p{font-size:12px;}
+  .footer-top{gap:24px;}
+  .footer-bottom{flex-direction:column;align-items:flex-start;}
+  .footer-tags{display:none;}
+  footer{padding:32px 16px 24px;}
+  .about-card{padding:24px;}
+  .about-name{font-size:26px;}
+  .hyp-quote{padding:20px 22px;}
+  .hyp-quote p{font-size:16px;}
+  .bl-body{padding:18px 18px;}
+  .bl-body h3{font-size:14px;}
+  .bl-body p{font-size:12px;}
+  section{padding:56px 0;}
+  .sec-title{font-size:clamp(22px,6vw,32px);}
+  .hero-meta{gap:16px;}
+  .marquee-item{font-size:10px;padding:0 20px;}
+}
+
+.survey-two-col{display:grid;grid-template-columns:1fr 2fr;gap:72px;align-items:start;}
+@media(max-width:860px){.survey-two-col{grid-template-columns:1fr;gap:28px;}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span class="nav-dot"></span>Deep Dive · BUas 2026</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#hypothesis">Hypothesis</a>
+    <a href="#findings">Findings</a>
+    <a href="#barriers">Barriers</a>
+    <a href="#comparison">Comparison</a>
+    <a href="#methods">Methods</a>
+    <a href="#survey">Survey</a>
+  </div>
+  <div class="nav-right">
+    <a href="https://www.linkedin.com/in/jasonwangsa/" target="_blank" class="nav-li">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="#5aabf5"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      LinkedIn
+    </a>
+    <span class="nav-badge">Jason Wangsa · 231681</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas id="particle-canvas"></canvas>
+  <div class="hero-content">
+    <div class="eyebrow-row">
+      <span class="ep">Deep Dive Research</span>
+      <span class="er"></span>
+      <span class="em">Logistics Engineering · Physical Internet · BUas · 2026</span>
+    </div>
+    <h1>
+      AV Regulatory Barriers<br>
+      Blocking <em>Physical Internet</em><br>
+      <strong>in the Netherlands</strong>
+    </h1>
+    <p class="hero-desc">Investigating why the Netherlands — with the technology, the ports, and the expertise — cannot deploy autonomous vehicles for Physical Internet hubs within 12 months. The answer is regulatory, not technical.</p>
+    <div class="hero-chips">
+      <span class="chip hi">Autonomous Vehicles</span>
+      <span class="chip hi">RDW Regulation</span>
+      <span class="chip hi">Port of Rotterdam</span>
+      <span class="chip">Physical Internet</span>
+      <span class="chip">Vienna Convention</span>
+      <span class="chip">Level 4 Freight</span>
+      <span class="chip">NL vs DE vs SE</span>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-num" data-target="21">0</div>
+      <div class="stat-label">Academic sources</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" data-target="12">0</div>
+      <div class="stat-label">Month deployment window</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" data-target="3">0</div>
+      <div class="stat-label">Countries compared</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" data-target="4">0</div>
+      <div class="stat-label">Barrier types coded</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">AV Technology <span>·</span></span>
+    <span class="marquee-item">RDW Approval Process <span>·</span></span>
+    <span class="marquee-item">Vienna Convention 1968 <span>·</span></span>
+    <span class="marquee-item">Port of Rotterdam <span>·</span></span>
+    <span class="marquee-item">Physical Internet <span>·</span></span>
+    <span class="marquee-item">Level 4 Autonomy <span>·</span></span>
+    <span class="marquee-item">Liability Framework <span>·</span></span>
+    <span class="marquee-item">Insurance Gap <span>·</span></span>
+    <span class="marquee-item">Einride Sweden <span>·</span></span>
+    <span class="marquee-item">German AV Law 2021 <span>·</span></span>
+    <span class="marquee-item">Regulatory Readiness Index <span>·</span></span>
+    <span class="marquee-item">Document Analysis <span>·</span></span>
+    <span class="marquee-item">AV Technology <span>·</span></span>
+    <span class="marquee-item">RDW Approval Process <span>·</span></span>
+    <span class="marquee-item">Vienna Convention 1968 <span>·</span></span>
+    <span class="marquee-item">Port of Rotterdam <span>·</span></span>
+    <span class="marquee-item">Physical Internet <span>·</span></span>
+    <span class="marquee-item">Level 4 Autonomy <span>·</span></span>
+    <span class="marquee-item">Liability Framework <span>·</span></span>
+    <span class="marquee-item">Insurance Gap <span>·</span></span>
+    <span class="marquee-item">Einride Sweden <span>·</span></span>
+    <span class="marquee-item">German AV Law 2021 <span>·</span></span>
+    <span class="marquee-item">Regulatory Readiness Index <span>·</span></span>
+    <span class="marquee-item">Document Analysis <span>·</span></span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" style="background:var(--navy);padding:100px 0;">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">About the researcher</span></div>
+    <div class="about-grid">
+      <div class="about-card reveal">
+        <div class="about-name">Jason <em>Wangsa</em></div>
+        <div class="about-role">Logistics Engineering Student</div>
+        <div class="about-divider"></div>
+        <div class="about-meta">
+          <div class="about-meta-row"><span class="about-meta-key">Student ID</span><span class="about-meta-val">231681</span></div>
+          <div class="about-meta-row"><span class="about-meta-key">Year</span><span class="about-meta-val">Third year, 2026</span></div>
+          <div class="about-meta-row"><span class="about-meta-key">Specialisation</span><span class="about-meta-val">Physical Internet</span></div>
+          <div class="about-meta-row"><span class="about-meta-key">Institution</span><span class="about-meta-val">BUas, Breda</span></div>
+          <div class="about-meta-row"><span class="about-meta-key">Internship</span><span class="about-meta-val">Rotra Brussels</span></div>
+          <div class="about-meta-row"><span class="about-meta-key">Minor (applying)</span><span class="about-meta-val">Maritime & Port Mgmt</span></div>
+        </div>
+        <a href="https://www.linkedin.com/in/jasonwangsa/" target="_blank" class="about-li-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#5aabf5"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          linkedin.com/in/jasonwangsa
+        </a>
+      </div>
+      <div class="about-text reveal">
+        <p>Third-year Logistics Engineering student at BUas, specialising in the Physical Internet. Previously interned at Rotra Brussels in airfreight inside sales, focusing on process optimisation and conversion rate analysis.</p>
+        <p>This research started from a simple observation: Rotterdam has the ports, the tech partnerships, and the ambition — yet Germany and Sweden are already running autonomous freight trucks commercially while the Netherlands is still on pilots. The gap isn't technical. It's regulatory, and that's what this Deep Dive sets out to prove.</p>
+        <div class="about-skills">
+          <span class="about-skill">Airfreight operations</span>
+          <span class="about-skill">Supply chain analytics</span>
+          <span class="about-skill">AV policy research</span>
+          <span class="about-skill">Physical Internet</span>
+          <span class="about-skill">Process optimisation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HYPOTHESIS -->
+<section class="hyp-section" id="hypothesis">
+  <div class="container">
+    <div class="hyp-inner">
+      <div class="hyp-left reveal">
+        <div class="hyp-label">Main hypothesis</div>
+        <h2>The core argument of this research</h2>
+      </div>
+      <div class="hyp-quote reveal">
+        <p><strong>Dutch regulatory barriers</strong> are the primary obstacles preventing Physical Internet hub implementation in Dutch ports, making deployment within 12 months <strong>unfeasible without direct regulatory intervention.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINDINGS -->
+<section id="findings" style="background:var(--navy);padding:100px 0;">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">Key findings from literature</span></div>
+    <h2 class="sec-title reveal">What we already know</h2>
+    <div class="findings-grid reveal">
+      <div class="finding"><div class="finding-num">01</div><div class="finding-bar" style="background:#378ADD;"></div><h3>Technology is ready — the problem lies elsewhere</h3><p>Level 4 AV technology for freight is proven in controlled scenarios. The Port of Rotterdam has been running autonomous terminal tractors since 2020. For hub-to-hub and node operations, technology is no longer the limiting factor.</p><div class="finding-cite">Snelder et al. (2025) · Kempen & Meijeren (2025)</div></div>
+      <div class="finding"><div class="finding-num">02</div><div class="finding-bar" style="background:var(--red);"></div><h3>Vienna Convention creates a legal vacuum for Level 4</h3><p>The 1968 Convention assumes a human driver at all times, creating a structural legal conflict for Level 4 autonomous operation under Dutch law. No national resolution has been enacted, unlike Germany and Sweden.</p><div class="finding-cite">Vellinga (2019) · Tjin Tai (2024)</div></div>
+      <div class="finding"><div class="finding-num">03</div><div class="finding-bar" style="background:var(--red);"></div><h3>RDW assesses every AV application case-by-case</h3><p>No standardised approval pathway exists for Level 4 in port or industrial zone environments. Each application is assessed individually, creating timeline uncertainty and discouraging both operator investment and insurance underwriting.</p><div class="finding-cite">RDW (2025) · CAD Europe</div></div>
+      <div class="finding"><div class="finding-num">04</div><div class="finding-bar" style="background:var(--amber);"></div><h3>Physical Internet demands continuous 24/7 autonomous operations</h3><p>Port-scale PI hubs require uninterrupted automated container movement. Unlike road freight, human drivers cannot substitute — the AV dependency is a fundamental architectural requirement, making the regulatory blocker even more critical.</p><div class="finding-cite">Ballot et al. (2020) · Nikitas et al. (2020)</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- BARRIERS -->
+<section id="barriers" style="background:var(--navy2);padding:100px 0;">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">Barrier coding framework</span></div>
+    <h2 class="sec-title reveal">Four barrier types</h2>
+    <p class="sec-sub reveal">Every source in the document analysis is coded by barrier type. This framework determines which category of obstacle appears most frequently and most severely in Dutch port operations.</p>
+    <div class="barriers-grid reveal">
+      <div class="barrier r"><div class="barrier-letter r">R</div><div class="barrier-name">Regulatory</div><div class="barrier-tags"><span class="barrier-tag">RDW process (R1)</span><span class="barrier-tag">Vienna Convention (R2)</span><span class="barrier-tag">Liability gap (R3)</span><span class="barrier-tag">Insurance gap (R4)</span></div></div>
+      <div class="barrier t"><div class="barrier-letter t">T</div><div class="barrier-name">Technical</div><div class="barrier-tags"><span class="barrier-tag">Sensor readiness</span><span class="barrier-tag">V2I infrastructure</span><span class="barrier-tag">5G connectivity</span><span class="barrier-tag">Road markings</span></div></div>
+      <div class="barrier e"><div class="barrier-letter e">E</div><div class="barrier-name">Economic</div><div class="barrier-tags"><span class="barrier-tag">ROI uncertainty</span><span class="barrier-tag">Fleet transition cost</span><span class="barrier-tag">Insurance premiums</span><span class="barrier-tag">Investment hesitation</span></div></div>
+      <div class="barrier c"><div class="barrier-letter c">C</div><div class="barrier-name">Cultural</div><div class="barrier-tags"><span class="barrier-tag">Public trust</span><span class="barrier-tag">Driver workforce</span><span class="barrier-tag">Operator conservatism</span><span class="barrier-tag">Risk aversion</span></div></div>
+    </div>
+    <div style="margin-top:56px;">
+      <div class="sec-eye reveal"><span class="sec-eye-txt">Specific regulatory blockers</span></div>
+      <div class="blockers reveal">
+        <div class="blocker"><div class="bl-accent"></div><div class="bl-body"><div class="bl-label">Blocker R1 — RDW approval process</div><h3>Case-by-case approval with no standardised port pathway</h3><p>No fast-track or standardised pathway exists for Level 4 in port/industrial zones. Every application is assessed individually by RDW, creating timeline uncertainty that discourages operator investment and makes insurance underwriting practically impossible.</p></div></div>
+        <div class="blocker"><div class="bl-accent b"></div><div class="bl-body"><div class="bl-label">Blocker R2 — Vienna Convention</div><h3>1968 Vienna Convention mandates a human driver at all times</h3><p>The Netherlands is legally bound by the Convention which requires human driver presence. Level 4 autonomous operation creates a liability vacuum that Dutch law has not resolved — unlike Germany (2021) and Sweden (2024) which enacted national legislation to circumvent this.</p></div></div>
+        <div class="blocker"><div class="bl-accent a"></div><div class="bl-body"><div class="bl-label">Blockers R3 & R4 — Liability & insurance chain</div><h3>No liability framework → no insurance → no deployment</h3><p>Unclear responsibility between manufacturer and operator makes insurers unwilling to offer coverage. Without insurance, operators cannot legally deploy AVs even when technology is fully ready. This chain — unclear liability → no insurance → no deployment — is the practical bottleneck that blocks Physical Internet hub implementation.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section id="comparison" style="background:var(--navy);padding:100px 0;">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">Comparative case analysis</span></div>
+    <h2 class="sec-title reveal">Netherlands vs. Germany vs. Sweden</h2>
+    <p class="sec-sub reveal">All three countries have equivalent access to AV technology. Differences in deployment outcomes are therefore explained by regulatory variables — not technical capability. This is the core logic of Method 2.</p>
+    <div class="compare-wrap reveal">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th class="center"><span class="flag">🇳🇱</span><div class="cname">Netherlands</div></th>
+            <th class="center"><span class="flag">🇩🇪</span><div class="cname">Germany</div></th>
+            <th class="center"><span class="flag">🇸🇪</span><div class="cname">Sweden</div></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Level 4 legal framework</td><td class="ctd"><span class="pill n">None</span></td><td class="ctd"><span class="pill y">Yes — 2021</span></td><td class="ctd"><span class="pill y">Yes — 2024</span></td></tr>
+          <tr><td>Approval process</td><td class="ctd" style="color:#F09595;">Case-by-case</td><td class="ctd" style="color:#5DCAA5;">Standardised</td><td class="ctd" style="color:#5DCAA5;">Standardised</td></tr>
+          <tr><td>Liability framework clarity</td><td class="ctd"><span class="pill n">Unclear</span></td><td class="ctd"><span class="pill y">Defined</span></td><td class="ctd"><span class="pill m">Partial</span></td></tr>
+          <tr><td>Insurance market available</td><td class="ctd"><span class="pill n">No</span></td><td class="ctd"><span class="pill y">Yes</span></td><td class="ctd"><span class="pill m">Emerging</span></td></tr>
+          <tr><td>Current deployment status</td><td class="ctd" style="color:var(--muted);">Pilots only</td><td class="ctd" style="color:#5DCAA5;">Commercially active</td><td class="ctd" style="color:#5DCAA5;">Einride — active</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- METHODS -->
+<section id="methods" class="methods-section" style="padding:100px 0;">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">Data collection plan</span></div>
+    <h2 class="sec-title reveal">Triangulated methodology</h2>
+    <div class="methods-grid reveal">
+      <div class="method"><span class="mnum">M1</span><div><h3>Document analysis</h3><p>15–20 publicly available policy documents plus 21 academic sources, coded R/T/E/C with sub-codes R1–R4. Frequency analysis identifies dominant barriers; timeline tracking tests 12-month feasibility.</p></div></div>
+      <div class="method"><span class="mnum">M2</span><div><h3>Comparative case analysis</h3><p>Structured comparison of the Netherlands, Germany, and Sweden across five regulatory dimensions. Equal AV technology access means deployment gaps are attributed to regulatory differences.</p></div></div>
+      <div class="method"><span class="mnum">M3</span><div><h3>Regulatory readiness index</h3><p>Each country scored per regulatory dimension, producing a measurable output quantifying how far the Netherlands lags. The index directly answers whether 12-month deployment is feasible and which gaps must close first.</p></div></div>
+      <div class="method"><span class="mnum">M4</span><div><h3>Interviews & survey (if access permits)</h3><p>Semi-structured interviews with RDW officials, Port of Rotterdam managers, and AV operators. A short survey for broader barrier ranking. Supplementary to M1–M3; skipped if access is unavailable within the research window.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH GAP -->
+<section style="background:var(--navy);padding:100px 0;">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">Research gap</span></div>
+    <h2 class="sec-title reveal">What the literature leaves unanswered</h2>
+    <div class="gap-grid reveal">
+      <div class="gap-card"><h4>Which barrier is worst?</h4><p>Regulatory, technical, economic, and cultural barriers are identified — but no study ranks them for Dutch port/industrial zone operations specifically.</p></div>
+      <div class="gap-card"><h4>How exactly does Dutch regulation block?</h4><p>Is it the slow RDW approval, unclear liability, or the insurance gap? The specific port-level mechanism remains unaddressed in existing literature.</p></div>
+      <div class="gap-card"><h4>Is 12-month deployment feasible?</h4><p>No existing literature assesses whether PI hub implementation in Dutch ports is achievable within a defined short-term timeframe.</p></div>
+      <div class="gap-card"><h4>What specific changes are needed?</h4><p>Problems are identified but the literature stops short of specifying concrete regulatory fixes that would actually enable deployment.</p></div>
+      <div class="gap-card"><h4>Vienna Convention opt-out?</h4><p>Does the Netherlands need a national opt-out from the 1968 Convention to legally enable Level 4 AV operations in port zones?</p></div>
+      <div class="gap-card"><h4>RDW fast-track for port zones?</h4><p>Could a dedicated fast-track process for controlled port environments unlock deployment without requiring full national legislation?</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES -->
+<section class="outcomes-section" style="padding:100px 0;">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">Desired outcomes</span></div>
+    <h2 class="sec-title reveal">What this research will deliver</h2>
+    <div class="outcomes-grid reveal">
+      <div class="outcome"><div class="oc-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L6.5 11.5L13 5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h4>Barrier ranking by severity</h4><p>A definitive ordering of regulatory, technical, economic, and cultural blockers specifically for Dutch port Physical Internet operations.</p></div></div>
+      <div class="outcome"><div class="oc-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L6.5 11.5L13 5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h4>Recommendations for companies</h4><p>Actionable guidance for port operators and logistics firms on what to monitor, prepare, and advocate for in anticipation of regulatory change.</p></div></div>
+      <div class="outcome"><div class="oc-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L6.5 11.5L13 5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h4>Policy suggestions for the Netherlands</h4><p>Specific changes — RDW fast-track, Road Traffic Act amendment, Vienna Convention national opt-out — that would enable 12-month deployment.</p></div></div>
+      <div class="outcome"><div class="oc-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L6.5 11.5L13 5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h4>Regulatory readiness decision framework</h4><p>A structured tool for assessing PI hub feasibility under current regulation vs. reformed scenarios, usable by both port operators and policymakers.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section" style="padding:100px 0;">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">Research phases</span></div>
+    <h2 class="sec-title reveal">Plan of approach</h2>
+    <div class="timeline reveal" style="margin-top:48px;">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">Phase 1 — Orientation</div>
+        <h4>Literature review & mind map</h4>
+        <p>Build the theoretical foundation across four thematic areas: AV technology readiness, Dutch regulatory frameworks, Physical Internet concepts, and barrier landscape. Develop the research gap and formulate the hypothesis.</p>
+        <span class="tl-tag">21 sources reviewed</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">Phase 2 — Proposal</div>
+        <h4>Hypothesis & data collection plan</h4>
+        <p>Formalise the hypothesis and design the triangulated methodology: document analysis, comparative case analysis (NL vs. DE vs. SE), and regulatory readiness index. Define coding framework R/T/E/C with sub-codes R1–R4.</p>
+        <span class="tl-tag">Methodology locked</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">Phase 3 — Execution</div>
+        <h4>Data collection & analysis</h4>
+        <p>Code 15–20 policy documents alongside the academic sources. Build the comparative table. Score each country on the regulatory readiness index. Conduct interviews if stakeholder access is confirmed (Thomas van den Born, Rhenus).</p>
+        <span class="tl-tag">Active phase</span>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">Phase 4 — Conclusion</div>
+        <h4>Final report & recommendations</h4>
+        <p>Synthesise findings into a ranked barrier analysis, policy recommendations, and a decision framework. Deliver actionable guidance for Dutch port operators and policymakers on enabling 12-month Physical Internet hub deployment.</p>
+        <span class="tl-tag">Final deliverable</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SURVEY -->
+<section id="survey" style="background:var(--navy2);padding:100px 0;border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="sec-eye reveal"><span class="sec-eye-txt">Practitioner survey</span></div>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:72px;align-items:start;" class="reveal survey-two-col">
+      <div>
+        <h2 class="sec-title" style="margin-bottom:16px;">Share your expert view</h2>
+        <p style="font-size:13.5px;color:var(--muted);line-height:1.8;margin-bottom:20px;">This research relies on practitioner perspectives to validate its findings. The survey takes 5-8 minutes and covers barrier ranking and hypothesis validation.</p>
+        <p style="font-size:12px;color:var(--faint);line-height:1.7;margin-bottom:28px;">Responses are used solely for academic research. You may remain anonymous.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);">
+            <span style="width:20px;height:20px;min-width:20px;border-radius:50%;border:1px solid rgba(29,158,117,0.4);background:rgba(29,158,117,0.1);display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>Rank the 4 barrier types by severity
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);">
+            <span style="width:20px;height:20px;min-width:20px;border-radius:50%;border:1px solid rgba(29,158,117,0.4);background:rgba(29,158,117,0.1);display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>Validate the main research hypothesis
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);">
+            <span style="width:20px;height:20px;min-width:20px;border-radius:50%;border:1px solid rgba(29,158,117,0.4);background:rgba(29,158,117,0.1);display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>Rate specific regulatory statements
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);">
+            <span style="width:20px;height:20px;min-width:20px;border-radius:50%;border:1px solid rgba(29,158,117,0.4);background:rgba(29,158,117,0.1);display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>Share open-ended insights (optional)
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:2px;padding:40px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;border:1px solid var(--border);opacity:0.4;"></div>
+        <div style="position:absolute;top:10px;right:10px;width:80px;height:80px;border-radius:50%;border:1px solid var(--border);opacity:0.3;"></div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:var(--blue);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);"></span>Survey preview
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:12px 16px;border-radius:2px;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;font-family:'DM Mono',monospace;">Section 1</div>
+            <div style="font-size:12.5px;color:var(--muted);">Your background — role and experience</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:12px 16px;border-radius:2px;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;font-family:'DM Mono',monospace;">Section 2</div>
+            <div style="font-size:12.5px;color:var(--muted);">Drag-and-drop barrier ranking (R / T / E / C)</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:12px 16px;border-radius:2px;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;font-family:'DM Mono',monospace;">Section 3</div>
+            <div style="font-size:12.5px;color:var(--muted);">Hypothesis validation and Likert scale rating</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:12px 16px;border-radius:2px;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;font-family:'DM Mono',monospace;">Section 4</div>
+            <div style="font-size:12.5px;color:var(--muted);">Open-ended insights and optional name</div>
+          </div>
+        </div>
+        <a href="deepdive_survey.html" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#378ADD;color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.07em;padding:15px 28px;border-radius:2px;text-decoration:none;width:100%;transition:background 0.2s;" onmouseover="this.style.background='#185FA5'" onmouseout="this.style.background='#378ADD'">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L13 8M9 4L13 8L9 12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Take the survey — 5 to 8 minutes
+        </a>
+        <div style="display:flex;gap:10px;margin-top:12px;"><a href="deepdive_survey.html#results" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:10px;border-radius:2px;text-decoration:none;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(99,160,255,0.28)'" onmouseout="this.style.borderColor='var(--border)'">View live results</a></div><div style="text-align:center;margin-top:10px;font-size:10px;color:var(--faint);font-family:'DM Mono',monospace;">Anonymous · Academic use only</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-name">Jason <em>Wangsa</em></div>
+        <div class="footer-inst">Logistics Engineering · Physical Internet Specialisation<br>Breda University of Applied Sciences · Student 231681<br>March 2026</div>
+        <a href="https://www.linkedin.com/in/jasonwangsa/" target="_blank" class="footer-li">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#5aabf5"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          linkedin.com/in/jasonwangsa
+        </a>
+      </div>
+      <div class="footer-links">
+        <h5>Jump to section</h5>
+        <div class="footer-links-list">
+          <a href="#about">About the researcher</a>
+          <a href="#hypothesis">Main hypothesis</a>
+          <a href="#findings">Key findings</a>
+          <a href="#barriers">Barrier framework</a>
+          <a href="#comparison">Country comparison</a>
+          <a href="#methods">Methodology</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">Deep Dive Research · BUas Logistics Engineering · 2026 · Can Physical Internet hubs be implemented in Dutch ports within 12 months given current AV regulations?</div>
+      <div class="footer-tags">
+        <span class="ftag">Physical Internet</span>
+        <span class="ftag">AV Regulation</span>
+        <span class="ftag">Rotterdam</span>
+        <span class="ftag">RDW</span>
+        <span class="ftag">Level 4</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Particle canvas
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let W, H;
+
+function resize() {
+  W = canvas.width = canvas.offsetWidth;
+  H = canvas.height = canvas.offsetHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r = Math.random() * 1.5 + 0.3;
+    this.alpha = Math.random() * 0.4 + 0.1;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(126,181,255,${this.alpha})`;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+function drawLines() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 100) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(126,181,255,${0.06 * (1 - dist/100)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawLines();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+reveals.forEach(el => observer.observe(el));
+
+// Counter animation
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  const duration = 1800;
+  const start = performance.now();
+  function update(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target);
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(update);
+}
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateCounter(entry.target);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-num[data-target]').forEach(el => counterObserver.observe(el));
+</script>
+</body>
+</html>
